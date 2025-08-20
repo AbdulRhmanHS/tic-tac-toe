@@ -32,6 +32,7 @@ function gameBoard () {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         gameBoard[i][j] = ' ';
+        document.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
       }
     }
   }
@@ -101,24 +102,48 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
     console.log(`It's ${getActivePlayer().name}'s turn!`);
   }
 
-  const playerRound = () => {
-    while (!winner.win) {    
-      printNewRound();
-      const row = Number(prompt(`Enter a row number (1-3):`)) - 1;
-      const col = Number(prompt(`Enter a column number (1-3):`)) - 1;
-      board.setCell(getActivePlayer().symbol, row, col);
-      winner = gameLogic(board.getGameBoard());
-      switchPlayerTurn();
-    }
-    if (winner.win) {
-      board.printBoard();
-      console.log(`Player ${winner.player} wins!`);
-      board.resetBoard();
-      winner.win = false;
-    }
+  function playerRound () {
+
+    // At the start of the game
+    const symbol = document.querySelector('.symbol');
+    symbol.textContent = getActivePlayer().name;
+    
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.addEventListener('click', () => {
+        if (cell.textContent == '' && !winner.win) {
+          let row = cell.dataset.row;
+          let col = cell.dataset.column;
+
+          // Update the game board
+          board.setCell(getActivePlayer().symbol, row, col);
+          cell.textContent = getActivePlayer().symbol;
+          
+          // Switch turn in the game and the screen
+          switchPlayerTurn();
+          symbol.textContent = getActivePlayer().name;
+
+          winner = gameLogic(board.getGameBoard());
+          printNewRound();
+
+          if (winner.win) {
+            console.log(`Player ${winner.player} wins!`);
+          }
+          else if (Array.from(document.querySelectorAll('.cell')).every(cell => cell.textContent != '')) {
+            console.log("It's a tie");
+          }
+        }
+        else if (winner.win || Array.from(document.querySelectorAll('.cell')).every(cell => cell.textContent != '')) {
+          board.resetBoard();
+          winner.win = false;
+        }
+      })
+    })
+
   }
 
-  return { playerRound, getActivePlayer }
+  return { playerRound }
 }
 
 const game = gameController();
+
+game.playerRound();
