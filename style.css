@@ -1,5 +1,13 @@
+:root {
+  --main-color-bright: white;
+  --secondary-color-bright: black;
+  --main-color-dark: black;
+  --secondary-color-dark: white;
+}
+
 html, body {
   min-height: 100vh;
+  width: 100%;
   margin: 0;
   padding: 0;
   display: flex;
@@ -7,6 +15,20 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 40px;
+  background-color: var(--main-color-bright);
+}
+
+#theme-toggle {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  color: var(--secondary-color-bright);
+  border: 2px solid var(--secondary-color-bright);
+  border-radius: 5px;
+  background-color: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 10px;
 }
 
 .board {
@@ -18,15 +40,15 @@ html, body {
 }
 
 .cell {
-  background-color: white;
-  color: black;
+  background-color: var(--main-color-bright);
+  color: var(--secondary-color-bright);
   border: none;
   font-size: min(8rem, 30vw);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 3px solid black;
+  border: 3px solid var(--secondary-color-bright);
 }
 
 /* Remove duplicates to keep clean tic-tac-toe */
@@ -36,11 +58,11 @@ html, body {
 .cell:nth-last-child(-n+3) { border-bottom: none; }
 
 .win {
-  color: white;
+  color: var(--main-color-bright);
 }
 
 .tie {
-  border-color: white;
+  border-color: var(--main-color-bright);
 }
 
 .description {
@@ -51,6 +73,7 @@ html, body {
   align-items: center;
   justify-content: space-around;
   text-align: center;
+  color: var(--secondary-color-bright);
 }
 
 .description > * {
@@ -67,6 +90,45 @@ html, body {
 .turn {
   font-size: 1.2rem;
 }
+
+/* Dark theme */
+.dark-theme {
+  --main-color: var(--main-color-dark);
+  --secondary-color: var(--secondary-color-dark);
+}
+
+.dark-theme html, body {
+  background-color: var(--main-color);
+}
+
+.dark-theme #theme-toggle {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.dark-theme .cell {
+  background-color: var(--main-color);
+  color: var(--secondary-color);
+  border: 3px solid var(--secondary-color);
+}
+
+.dark-theme .description {
+  color: var(--secondary-color);
+}
+
+.dark-theme .win {
+  color: var(--main-color);
+}
+
+.dark-theme .tie {
+  border-color: var(--main-color);
+}
+
+.cell:nth-child(-n+3) { border-top: none; }
+.cell:nth-child(3n+1) { border-left: none; }
+.cell:nth-child(3n)   { border-right: none; }
+.cell:nth-last-child(-n+3) { border-bottom: none; }
+/* Dark theme */
 
 @media (max-width: 600px) {
   .description {
