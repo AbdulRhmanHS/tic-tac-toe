@@ -87,13 +87,17 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
   const players = [
     {
       name: playerOne,
-      symbol: 'X'
+      symbol: 'X',
+      score: 0
     }, 
     {
       name: playerTwo,
-      symbol: 'O'
+      symbol: 'O',
+      score: 0
     }
   ];
+
+  let tie = 0;
 
   let activePlayer = players[0];
 
@@ -101,6 +105,12 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
 
   let winInterval = null;
   let tieInterval = null;
+
+  document.querySelector('.x-score .score').textContent = players[0].score;
+  document.querySelector('.o-score .score').textContent = players[1].score;
+  document.querySelector('.tie-score .score').textContent = tie;
+
+  const increaseScore = (player) => player.score++;
 
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -134,22 +144,30 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
           winner = gameLogic(board.getGameBoard());
 
           if (winner.win) {
-
             // Flashing the winning cells
             winInterval = setInterval(() => {
               Array.from(document.querySelectorAll('.cell')).find(c => c.dataset.row == winner.cell1[0] && c.dataset.column == winner.cell1[1]).classList.toggle('win');
               Array.from(document.querySelectorAll('.cell')).find(c => c.dataset.row == winner.cell2[0] && c.dataset.column == winner.cell2[1]).classList.toggle('win');
               Array.from(document.querySelectorAll('.cell')).find(c => c.dataset.row == winner.cell3[0] && c.dataset.column == winner.cell3[1]).classList.toggle('win');
             }, 300);
+
+            // Increase the score
+            const winnerPlayer = players.find(player => player.symbol == winner.player);
+            increaseScore(winnerPlayer);
+            document.querySelector('.x-score .score').textContent = players[0].score;
+            document.querySelector('.o-score .score').textContent = players[1].score;
           }
           else if (Array.from(document.querySelectorAll('.cell')).every(cell => cell.textContent != '')) {
-
             // Flashing the board grid lines
             tieInterval = setInterval(() => {
               document.querySelectorAll('.cell').forEach(c => {
                 c.classList.toggle('tie');
               })
             }, 300);
+
+            // Increase the score
+            tie++;
+            document.querySelector('.tie-score .score').textContent = tie;
           }
         }
         else if (winner.win || Array.from(document.querySelectorAll('.cell')).every(cell => cell.textContent != '')) {
