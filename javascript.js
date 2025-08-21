@@ -4,7 +4,6 @@ function gameBoard () {
 
   let gameBoard = [];
 
-
   // Create the game board at start
   for (let i = 0; i < 3; i++) {
     gameBoard.push([]);
@@ -15,12 +14,6 @@ function gameBoard () {
   }
 
   const getGameBoard = () => gameBoard;
-
-  const printBoard = () => {
-    for (let i = 0; i < 3; i++) {
-      console.log(gameBoard[i]);
-    }
-  }
 
   function setCell(value, row, col) {
     if (gameBoard[row][col] == ' ') {
@@ -37,14 +30,17 @@ function gameBoard () {
     }
   }
 
-  return { setCell, printBoard, resetBoard, getGameBoard };
+  return { setCell, resetBoard, getGameBoard };
 }
 
 function gameLogic (board) {
 
   let winner = {
     player: null,
-    win: false
+    win: false,
+    cell1: null,
+    cell2: null,
+    cell3: null
   };
 
   // Check each row and column
@@ -52,10 +48,16 @@ function gameLogic (board) {
     if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ') {
       winner.win = true;
       winner.player = board[i][0];
+      winner.cell1 = [i, 0];
+      winner.cell2 = [i, 1];
+      winner.cell3 = [i, 2];
     }
     else if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != ' ') {
       winner.win = true;
       winner.player = board[0][i];
+      winner.cell1 = [0, i];
+      winner.cell2 = [1, i];
+      winner.cell3 = [2, i];
     }
   }
 
@@ -63,10 +65,16 @@ function gameLogic (board) {
   if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ') {
     winner.win = true;
     winner.player = board[0][0];
+    winner.cell1 = [0, 0];
+    winner.cell2 = [1, 1];
+    winner.cell3 = [2, 2];
   }
   else if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ') {
     winner.win = true;
     winner.player = board[0][2];
+    winner.cell1 = [0, 2];
+    winner.cell2 = [1, 1];
+    winner.cell3 = [2, 0];
   }
 
   return winner;
@@ -91,16 +99,14 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
 
   let winner = gameLogic(board.getGameBoard());
 
+  let winInterval = null;
+  let tieInterval = null;
+
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
 
   const getActivePlayer = () => activePlayer;
-
-  const printNewRound = () => {
-    board.printBoard();
-    console.log(`It's ${getActivePlayer().name}'s turn!`);
-  }
 
   function playerRound () {
 
@@ -111,6 +117,8 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
     document.querySelectorAll('.cell').forEach(cell => {
       cell.addEventListener('click', () => {
         if (cell.textContent == '' && !winner.win) {
+
+          // Get the cell coordinates from the dataset
           let row = cell.dataset.row;
           let col = cell.dataset.column;
 
@@ -122,19 +130,45 @@ function gameController (playerOne = 'X', playerTwo = 'O') {
           switchPlayerTurn();
           symbol.textContent = getActivePlayer().name;
 
+          // Check for a winner
           winner = gameLogic(board.getGameBoard());
-          printNewRound();
 
           if (winner.win) {
-            console.log(`Player ${winner.player} wins!`);
+
+            // Flashing the winning cells
+            winInterval = setInterval(() => {
+              Array.from(document.querySelectorAll('.cell')).find(c => c.dataset.row == winner.cell1[0] && c.dataset.column == winner.cell1[1]).classList.toggle('win');
+              Array.from(document.querySelectorAll('.cell')).find(c => c.dataset.row == winner.cell2[0] && c.dataset.column == winner.cell2[1]).classList.toggle('win');
+              Array.from(document.querySelectorAll('.cell')).find(c => c.dataset.row == winner.cell3[0] && c.dataset.column == winner.cell3[1]).classList.toggle('win');
+            }, 300);
           }
           else if (Array.from(document.querySelectorAll('.cell')).every(cell => cell.textContent != '')) {
-            console.log("It's a tie");
+
+            // Flashing the board grid lines
+            tieInterval = setInterval(() => {
+              document.querySelectorAll('.cell').forEach(c => {
+                c.classList.toggle('tie');
+              })
+            }, 300);
           }
         }
         else if (winner.win || Array.from(document.querySelectorAll('.cell')).every(cell => cell.textContent != '')) {
           board.resetBoard();
           winner.win = false;
+
+          // Clear intervals and remove classes
+          if (winInterval !== null) {
+            clearInterval(winInterval);
+            document.querySelectorAll('.cell').forEach(c => {
+              c.classList.remove('win');
+            })
+          }
+          if (tieInterval !== null) {
+            clearInterval(tieInterval);
+            document.querySelectorAll('.cell').forEach(c => {
+              c.classList.remove('tie');
+            })
+          }
         }
       })
     })

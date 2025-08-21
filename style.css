@@ -19,6 +19,7 @@ html, body {
 
 .cell {
   background-color: white;
+  color: black;
   border: none;
   font-size: min(8rem, 30vw);
   cursor: pointer;
@@ -33,6 +34,14 @@ html, body {
 .cell:nth-child(3n+1) { border-left: none; }
 .cell:nth-child(3n)   { border-right: none; }
 .cell:nth-last-child(-n+3) { border-bottom: none; }
+
+.win {
+  color: white;
+}
+
+.tie {
+  border-color: white;
+}
 
 .description {
   font-size: 1.5rem;
